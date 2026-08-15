@@ -9,9 +9,34 @@ const RING_RADIUS = 94;
 const BIG_RADIUS = 32;
 const SMALL_RADIUS = 16;
 
+function makeNoteClickable(
+  circle: SVGCircleElement,
+  semitone: number,
+  label: string,
+  onNoteClick: ((semitone: number) => void) | undefined,
+): void {
+  if (!onNoteClick) return;
+  circle.setAttribute("role", "button");
+  circle.setAttribute("tabindex", "0");
+  circle.setAttribute("aria-label", `Play ${label}`);
+  circle.classList.add("wheel-note-clickable");
+  circle.addEventListener("click", () => onNoteClick(semitone));
+  circle.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onNoteClick(semitone);
+    }
+  });
+}
+
 // Uses the container's own document (not the global `document`) so this is
 // callable from a test with no ambient DOM, and from the real page either way.
-export function renderWheel(container: HTMLElement, mode: Mode, activeDegree: number | null): void {
+export function renderWheel(
+  container: HTMLElement,
+  mode: Mode,
+  activeDegree: number | null,
+  onNoteClick?: (semitone: number) => void,
+): void {
   const doc = container.ownerDocument;
   container.innerHTML = "";
   container.dataset.mode = mode.id;
@@ -40,6 +65,7 @@ export function renderWheel(container: HTMLElement, mode: Mode, activeDegree: nu
     if (isInScale) {
       circle.style.fill = mode.color;
     }
+    makeNoteClickable(circle, note.semitone, note.label, onNoteClick);
     svg.append(circle);
 
     const label = doc.createElementNS(SVG_NS, "text");
@@ -57,7 +83,7 @@ export function renderWheel(container: HTMLElement, mode: Mode, activeDegree: nu
 
 // A static "here is everything" wheel: all 12 notes in one neutral color,
 // no scale or playing state — the baseline every mode picks a subset from.
-export function renderBaselineWheel(container: HTMLElement): void {
+export function renderBaselineWheel(container: HTMLElement, onNoteClick?: (semitone: number) => void): void {
   const doc = container.ownerDocument;
   container.innerHTML = "";
 
@@ -78,6 +104,7 @@ export function renderBaselineWheel(container: HTMLElement): void {
       ),
     );
     circle.dataset.semitone = String(note.semitone);
+    makeNoteClickable(circle, note.semitone, note.label, onNoteClick);
     svg.append(circle);
 
     const label = doc.createElementNS(SVG_NS, "text");

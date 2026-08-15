@@ -1,11 +1,6 @@
 import { JSDOM } from "jsdom";
-import { describe, expect, it } from "vitest";
-import {
-  buildScaleRunDegrees,
-  CHARACTER_SKELETON,
-  CHARACTER_SKELETON_PENTATONIC,
-  realizeMelody,
-} from "../src/scripts/melody";
+import { describe, expect, it, vi } from "vitest";
+import { buildScaleRunDegrees, realizeDegrees } from "../src/scripts/melody";
 import { MODES, frequencyForDegree, modePattern } from "../src/scripts/modes";
 import { renderBaselineWheel, renderModeLabel, renderWheel } from "../src/scripts/render-mode-view";
 import { layoutWheel } from "../src/scripts/wheel-layout";
@@ -56,9 +51,32 @@ describe("mode interval tables", () => {
     const ionian = MODES.find((m) => m.id === "ionian")!;
     expect(modePattern(ionian)).toBe("W-W-H-W-W-W-H");
   });
+
+  it("every mode has a non-empty, hand-composed tune using its own scale degrees", () => {
+    for (const mode of MODES) {
+      expect(mode.tune.length).toBeGreaterThan(0);
+      for (const degree of mode.tune) {
+        expect(degree).toBeGreaterThanOrEqual(1);
+        expect(degree).toBeLessThanOrEqual(mode.offsets.length + 1);
+      }
+    }
+  });
 });
 
-describe("scale-run degrees (segment 1: walk every note of this mode's scale)", () => {
+describe("frequencyForDegree octave wrap", () => {
+  it("lands degree = offsets.length + 1 exactly one octave above the tonic", () => {
+    const ionian = MODES.find((m) => m.id === "ionian")!;
+    const octave = frequencyForDegree(TONIC_HZ, ionian, ionian.offsets.length + 1);
+    expect(octave).toBeCloseTo(TONIC_HZ * 2, 1);
+  });
+
+  it("degree 1 is the unwrapped tonic itself", () => {
+    const ionian = MODES.find((m) => m.id === "ionian")!;
+    expect(frequencyForDegree(TONIC_HZ, ionian, 1)).toBeCloseTo(TONIC_HZ, 1);
+  });
+});
+
+describe("scale-run degrees (walk every note of this mode's scale)", () => {
   it("ascends through every degree then descends back to the tonic, for any note count", () => {
     expect(buildScaleRunDegrees(5)).toEqual([1, 2, 3, 4, 5, 4, 3, 2, 1]);
     expect(buildScaleRunDegrees(6)).toEqual([1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1]);
@@ -66,45 +84,38 @@ describe("scale-run degrees (segment 1: walk every note of this mode's scale)", 
   });
 });
 
-describe("melody realization (segment 1 scale-run + segment 2 character tune)", () => {
-  it("plays the scale-run segment first, then the character segment, back to back", () => {
+describe("realizeDegrees (turns any degree list into playable events)", () => {
+  it("realizes a mode's own hand-composed tune in order, with sequential timing", () => {
     const ionian = MODES.find((m) => m.id === "ionian")!;
-    const events = realizeMelody(TONIC_HZ, ionian, 400);
+    const events = realizeDegrees(TONIC_HZ, ionian, ionian.tune, 400);
 
-    const scan = events.filter((e) => e.segment === "scan");
-    const character = events.filter((e) => e.segment === "character");
-
-    expect(scan.map((e) => e.degree)).toEqual(buildScaleRunDegrees(7));
-    expect(character.map((e) => e.degree)).toEqual(CHARACTER_SKELETON);
-    expect(character[0].startMs).toBeGreaterThan(scan[scan.length - 1].startMs);
+    expect(events.map((e) => e.degree)).toEqual(ionian.tune);
+    expect(events.map((e) => e.startMs)).toEqual(ionian.tune.map((_, i) => i * 400));
   });
 
-  it("uses the pentatonic character skeleton for 5-note scales, and its own scale-run length", () => {
+  it("realizes a scale-run the same way, independent of any mode's tune", () => {
     const pentatonic = MODES.find((m) => m.id === "major-pentatonic")!;
-    const events = realizeMelody(TONIC_HZ, pentatonic, 400);
+    const degrees = buildScaleRunDegrees(pentatonic.offsets.length);
+    const events = realizeDegrees(TONIC_HZ, pentatonic, degrees, 400);
 
-    const scan = events.filter((e) => e.segment === "scan");
-    const character = events.filter((e) => e.segment === "character");
-
-    expect(scan.map((e) => e.degree)).toEqual(buildScaleRunDegrees(5));
-    expect(character.map((e) => e.degree)).toEqual(CHARACTER_SKELETON_PENTATONIC);
+    expect(events.map((e) => e.degree)).toEqual(degrees);
   });
 
-  it("never produces a non-finite frequency for any mode (guards the degree-beyond-offsets bug)", () => {
+  it("never produces a non-finite frequency for any mode's tune (guards the octave-wrap math)", () => {
     for (const mode of MODES) {
-      const events = realizeMelody(TONIC_HZ, mode, 400);
+      const events = realizeDegrees(TONIC_HZ, mode, mode.tune, 400);
       for (const event of events) {
         expect(Number.isFinite(event.frequency)).toBe(true);
       }
     }
   });
 
-  it("produces different frequencies for the same skeleton in different modes", () => {
+  it("produces different frequencies for the same degree in different modes", () => {
     const ionian = MODES.find((m) => m.id === "ionian")!;
     const phrygian = MODES.find((m) => m.id === "phrygian")!;
 
-    const ionianEvents = realizeMelody(TONIC_HZ, ionian, 400).filter((e) => e.segment === "character");
-    const phrygianEvents = realizeMelody(TONIC_HZ, phrygian, 400).filter((e) => e.segment === "character");
+    const ionianEvents = realizeDegrees(TONIC_HZ, ionian, [1, 2, 3], 400);
+    const phrygianEvents = realizeDegrees(TONIC_HZ, phrygian, [1, 2, 3], 400);
 
     expect(ionianEvents[1].frequency).not.toBeCloseTo(phrygianEvents[1].frequency, 1);
   });
@@ -172,6 +183,31 @@ describe("wheel rendering (the visible state a mode-switch produces)", () => {
     expect(container.dataset.mode).toBe("aeolian");
     expect(container.querySelectorAll(".wheel-note-playing")).toHaveLength(0);
   });
+
+  it("makes every note clickable and calls back with its semitone when clicked", () => {
+    const container = dom.window.document.createElement("div");
+    const ionian = MODES.find((m) => m.id === "ionian")!;
+    const onNoteClick = vi.fn();
+    renderWheel(container, ionian, null, onNoteClick);
+
+    const notes = container.querySelectorAll(".wheel-note-clickable");
+    expect(notes).toHaveLength(12);
+
+    const first = notes[0] as unknown as HTMLElement;
+    expect(first.getAttribute("role")).toBe("button");
+    expect(first.getAttribute("tabindex")).toBe("0");
+    first.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+
+    expect(onNoteClick).toHaveBeenCalledWith(Number(first.getAttribute("data-semitone")));
+  });
+
+  it("does not make notes clickable when no onNoteClick callback is given", () => {
+    const container = dom.window.document.createElement("div");
+    const ionian = MODES.find((m) => m.id === "ionian")!;
+    renderWheel(container, ionian, null);
+
+    expect(container.querySelectorAll(".wheel-note-clickable")).toHaveLength(0);
+  });
 });
 
 describe("baseline wheel (all 12 notes, no mode applied)", () => {
@@ -183,6 +219,20 @@ describe("baseline wheel (all 12 notes, no mode applied)", () => {
     expect(container.querySelectorAll(".wheel-note")).toHaveLength(12);
     expect(container.querySelectorAll(".wheel-note-in-scale")).toHaveLength(0);
     expect(container.querySelectorAll(".wheel-note-playing")).toHaveLength(0);
+  });
+
+  it("makes every note clickable and calls back with its semitone when clicked", () => {
+    const dom = new JSDOM("<!doctype html><html><body></body></html>");
+    const container = dom.window.document.createElement("div");
+    const onNoteClick = vi.fn();
+    renderBaselineWheel(container, onNoteClick);
+
+    const notes = container.querySelectorAll(".wheel-note-clickable");
+    expect(notes).toHaveLength(12);
+
+    const first = notes[0] as unknown as HTMLElement;
+    first.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true }));
+    expect(onNoteClick).toHaveBeenCalledWith(Number(first.getAttribute("data-semitone")));
   });
 });
 

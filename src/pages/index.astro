@@ -10,40 +10,39 @@ const pentatonicScales = MODES.filter((mode) => mode.group === "pentatonic");
 <Layout title="Same melody, different mode — why a scale's shape changes its mood">
   <header>
     <nav aria-label="Primary">
-      <a href="./">Home</a>
+      <a href="#mode-primer">What is a mode</a>
+      <a href="#play">Play</a>
     </nav>
   </header>
   <main>
     <h1>The same tune, thirteen different moods</h1>
     <p data-testid="intro">
-      Every mode below plays the same two-part idea: first a run through all
-      of that mode's own notes, then a short, memorable tune shaped the same
-      way regardless of how many notes the mode has. What changes is which
-      notes each mode picks out, and that alone is enough to make it sound
-      bright, sad, bittersweet, exotic or tense. Click a mode to hear it, and
-      watch the ring light up.
+      Every mode below is the same 12 notes, picking out a different subset in
+      a different order. Click a note on the wheel to hear it by itself, click
+      a mode to hear a short tune written for it, or play its full scale on
+      its own. What changes is only which notes get picked — and that alone
+      is enough to sound bright, sad, bittersweet, exotic, or tense.
     </p>
 
-    <details class="mode-primer">
+    <details class="mode-primer" id="mode-primer">
       <summary>What is a mode in music?</summary>
       <p>
         A <strong>mode</strong> (or scale) is a specific pattern of whole and
-        half steps chosen from the 12 pitches Western music recognizes.
-        Below is all 12, with no mode applied — nothing colored, nothing
-        picked out. Every mode you can play on this page, and every scale in
-        music generally, is simply a particular subset of these same 12
-        notes, arranged in a particular order.
+        half steps chosen from the 12 pitches Western music recognizes. Below
+        is all 12, with no mode applied — nothing picked out. Every mode
+        below, and every scale in music generally, is simply a particular
+        subset of these same 12 notes, arranged in a particular order. Click
+        any of them to hear the raw pitch.
       </p>
       <div id="baseline-wheel" class="wheel wheel-baseline" data-testid="baseline-wheel"></div>
       <p class="hint">
-        This is the complete set — every mode below just selects from within
-        it. Five- and six-note scales (like the pentatonic scales further
-        down) select fewer notes than the seven-note church modes, which is
+        Five- and six-note scales (like the pentatonic scales further down)
+        select fewer notes than the seven-note church modes, which is part of
         why they sound so different even though they draw from the same 12.
       </p>
     </details>
 
-    <section aria-labelledby="wheel-heading">
+    <section aria-labelledby="wheel-heading" id="play">
       <h2 id="wheel-heading">Play a mode</h2>
 
       <div class="mode-groups">
@@ -102,15 +101,17 @@ const pentatonicScales = MODES.filter((mode) => mode.group === "pentatonic");
         </div>
       </div>
 
-      <div id="mode-label" class="mode-label" data-testid="mode-label"></div>
-      <div id="wheel" class="wheel" data-testid="wheel"></div>
+      <div class="mode-panel">
+        <div id="mode-label" class="mode-label" data-testid="mode-label"></div>
+        <div id="wheel" class="wheel" data-testid="wheel"></div>
+        <button type="button" id="play-scale-button" class="scale-button">▶ Hear the full scale</button>
+      </div>
       <p class="hint">
         The big circles are the piano's white keys (naturals); the small ones
         nested between them are the black keys (accidentals) — a fixed
-        layout, the same for every mode. Whichever notes light up in color
-        are this mode's scale, chosen from among those 12; the one with a
-        dark outline is the note currently sounding. Each mode plays its own
-        full scale first, then the short tune.
+        layout, the same for every mode. Whichever notes are filled in are
+        this mode's scale; the one with a dark outline is the note currently
+        sounding. Click any note directly to hear just that pitch.
       </p>
     </section>
   </main>
