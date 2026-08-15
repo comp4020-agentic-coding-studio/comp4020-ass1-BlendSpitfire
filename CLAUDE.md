@@ -36,6 +36,9 @@ you plan or build, and see `spec/README.md` for how the checks relate to them.
   --- the page is wrong until the check is green, not until you decide it should
   be.
 - Commit when the checks pass. Never commit a red state.
+- The first time the dev server starts (or restarts) a build in a session,
+  end your reply with the local URL to visit so it's easy to check the effect
+  right away.
 
 ## The checks (your sensors)
 
@@ -161,3 +164,12 @@ catching you out, a fact about the stack the agent keeps getting wrong --- write
 it down here. Growing this file is the work of harness engineering, and the gap
 between this boilerplate and your own version is part of what your prototype
 says about the developer you're becoming.
+
+# Conventions
+
+- When editing this file (CLAUDE.md), write the content in English.
+- Any document meant to be viewable by others (e.g. commit messages, CLAUDE.md
+  files, PROCESS.md, reflections) must be written in English, regardless of the
+  language used in conversation.
+
+# Behavior Guidelines

@@ -2,19 +2,42 @@
 import Layout from "../layouts/Layout.astro";
 ---
 
-<Layout title="COMP4020 prototype">
+<Layout title="Same melody, different mode — why a scale's shape changes its mood">
   <header>
     <nav aria-label="Primary">
       <a href="./">Home</a>
     </nav>
   </header>
   <main>
-    <h1>COMP4020 prototype</h1>
+    <h1>The same nine notes, four different moods</h1>
     <p data-testid="intro">
-      Replace this with your prototype. This week's brief is on the course
-      website; <code>spec/README.md</code> explains how the checks in this repo
-      relate to it.
+      This is the same short melody — <strong>1‑2‑3‑4‑5‑6‑5‑3‑1</strong>, stated
+      as scale degrees, not pitches — played through four different musical
+      modes. Nothing about the tune changes. What changes is which 7 notes
+      each mode picks out, and that alone is enough to make it sound bright,
+      sad, bittersweet or tense. Click a mode to hear it, and watch the ring
+      light up.
     </p>
+
+    <section aria-labelledby="wheel-heading">
+      <h2 id="wheel-heading">Play a mode</h2>
+      <div class="mode-buttons" role="group" aria-label="Mode">
+        <button type="button" data-mode-button="ionian" aria-pressed="true">Ionian (major)</button>
+        <button type="button" data-mode-button="aeolian" aria-pressed="false">Aeolian (minor)</button>
+        <button type="button" data-mode-button="dorian" aria-pressed="false">Dorian</button>
+        <button type="button" data-mode-button="phrygian" aria-pressed="false">Phrygian</button>
+      </div>
+
+      <div id="mode-label" class="mode-label" data-testid="mode-label"></div>
+      <div id="wheel" class="wheel" data-testid="wheel"></div>
+      <p class="hint">
+        The 7 big circles are the piano's white keys (naturals); the 5 small
+        ones nested between them are the black keys (accidentals) — a fixed
+        layout, the same for every mode. Whichever 7 notes light up in color
+        are this mode's scale, chosen from among those 12; the one with a
+        dark outline is the note currently sounding.
+      </p>
+    </section>
   </main>
   <script src="../scripts/main.ts"></script>
 </Layout>
