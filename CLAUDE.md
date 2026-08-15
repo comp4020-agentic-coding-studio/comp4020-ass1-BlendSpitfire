@@ -173,3 +173,9 @@ says about the developer you're becoming.
   language used in conversation.
 
 # Behavior Guidelines
+
+- After finishing a significant chunk of work (a feature, a design iteration,
+  a meaningful piece of implementation) and checks are green, commit
+  automatically without asking first.
+- After a minor tweak (a copy edit, a single CSS/parameter change, a small
+  fix), ask before committing instead of committing automatically.
