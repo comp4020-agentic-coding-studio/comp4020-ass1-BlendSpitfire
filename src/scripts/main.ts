@@ -2,7 +2,7 @@ import type { PlaybackHandle } from "./audio-player";
 import { playMelody } from "./audio-player";
 import { realizeMelody } from "./melody";
 import { MODES } from "./modes";
-import { renderModeLabel, renderWheel } from "./render-mode-view";
+import { renderBaselineWheel, renderModeLabel, renderWheel } from "./render-mode-view";
 
 const TONIC_HZ = 261.63; // C4
 const NOTE_DURATION_MS = 400;
@@ -10,6 +10,11 @@ const NOTE_DURATION_MS = 400;
 const wheel = document.querySelector<HTMLElement>("#wheel");
 const label = document.querySelector<HTMLElement>("#mode-label");
 const buttons = document.querySelectorAll<HTMLButtonElement>("[data-mode-button]");
+const baselineWheel = document.querySelector<HTMLElement>("#baseline-wheel");
+
+if (baselineWheel) {
+  renderBaselineWheel(baselineWheel);
+}
 
 if (wheel && label && buttons.length > 0) {
   let playback: PlaybackHandle | null = null;

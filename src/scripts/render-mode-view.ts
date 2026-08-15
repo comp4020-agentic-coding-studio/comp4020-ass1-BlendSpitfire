@@ -55,6 +55,47 @@ export function renderWheel(container: HTMLElement, mode: Mode, activeDegree: nu
   container.append(svg);
 }
 
+// A static "here is everything" wheel: all 12 notes in one neutral color,
+// no scale or playing state — the baseline every mode picks a subset from.
+export function renderBaselineWheel(container: HTMLElement): void {
+  const doc = container.ownerDocument;
+  container.innerHTML = "";
+
+  const svg = doc.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${VIEW_SIZE} ${VIEW_SIZE}`);
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", "All 12 notes, with no mode applied");
+
+  for (const note of layoutWheel(CENTER, RING_RADIUS, BIG_RADIUS, SMALL_RADIUS)) {
+    const circle = doc.createElementNS(SVG_NS, "circle");
+    circle.setAttribute("cx", String(note.point.x));
+    circle.setAttribute("cy", String(note.point.y));
+    circle.setAttribute("r", String(note.radius));
+    circle.setAttribute(
+      "class",
+      ["wheel-note", "wheel-note-baseline", note.isNatural ? "wheel-note-natural" : "wheel-note-accidental"].join(
+        " ",
+      ),
+    );
+    circle.dataset.semitone = String(note.semitone);
+    svg.append(circle);
+
+    const label = doc.createElementNS(SVG_NS, "text");
+    label.setAttribute("x", String(note.point.x));
+    label.setAttribute("y", String(note.point.y));
+    label.setAttribute(
+      "class",
+      ["wheel-note-baseline", note.isNatural ? "wheel-note-label" : "wheel-note-label-small"].join(" "),
+    );
+    label.setAttribute("text-anchor", "middle");
+    label.setAttribute("dominant-baseline", "central");
+    label.textContent = note.label;
+    svg.append(label);
+  }
+
+  container.append(svg);
+}
+
 export function renderModeLabel(container: HTMLElement, mode: Mode): void {
   const doc = container.ownerDocument;
   container.innerHTML = "";
@@ -67,5 +108,9 @@ export function renderModeLabel(container: HTMLElement, mode: Mode): void {
   pattern.className = "mode-pattern";
   pattern.textContent = modePattern(mode);
 
-  container.append(name, pattern);
+  const description = doc.createElement("p");
+  description.className = "mode-description";
+  description.textContent = mode.description;
+
+  container.append(name, pattern, description);
 }
