@@ -11,12 +11,16 @@ export function buildScaleRunDegrees(noteCount: number): number[] {
 }
 
 // The one shared tune every non-pentatonic mode plays on click — climb
-// stepwise almost to the top of the scale, then step back down to the tonic.
-// Walking every degree in between (not just skipping in thirds) is what
-// makes each mode's own color come through; every non-pentatonic mode has at
-// least 6 degrees, so this needs no octave wrap.
+// stepwise all the way to the 7th degree, then resolve back to the tonic by
+// thirds. Touching every degree from 1 to 7 matters, not just style: modes
+// that differ from each other in only one degree (e.g. Ionian vs Mixolydian,
+// which differ only at the 7th) need that exact degree sounded, or the two
+// tunes are literally the same notes. Some 6-note scales in this group
+// (whole tone, blues) don't have a 7th degree of their own, so degree 7 there
+// wraps to the octave above the tonic — still a fine landing point for the
+// same phrase shape.
 export function buildSharedTuneDegrees(): number[] {
-  return [1, 2, 3, 4, 5, 6, 5, 3, 1];
+  return [1, 2, 3, 4, 5, 6, 7, 5, 3, 1];
 }
 
 // A single ascending pass through every note of the scale, ending on the

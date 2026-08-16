@@ -86,8 +86,34 @@ describe("scale-run degrees (walk every note of this mode's scale)", () => {
 });
 
 describe("shared tune degrees (the one melody every non-pentatonic mode plays)", () => {
-  it("climbs stepwise through every degree up to 6, then steps back down to the tonic", () => {
-    expect(buildSharedTuneDegrees()).toEqual([1, 2, 3, 4, 5, 6, 5, 3, 1]);
+  it("climbs stepwise through every degree up to 7, then resolves to the tonic by thirds", () => {
+    expect(buildSharedTuneDegrees()).toEqual([1, 2, 3, 4, 5, 6, 7, 5, 3, 1]);
+  });
+
+  it("touches every degree from 1 to 7, so modes differing at only one degree still sound different", () => {
+    const degrees = new Set(buildSharedTuneDegrees());
+    for (let degree = 1; degree <= 7; degree++) {
+      expect(degrees.has(degree)).toBe(true);
+    }
+  });
+});
+
+describe("shared tune distinguishes modes that differ in only one degree", () => {
+  const pairsThatOnlyDifferAt7: [string, string][] = [
+    ["ionian", "mixolydian"],
+    ["dorian", "melodic-minor"],
+    ["aeolian", "harmonic-minor"],
+  ];
+
+  it.each(pairsThatOnlyDifferAt7)("%s and %s produce different frequencies somewhere in the shared tune", (idA, idB) => {
+    const modeA = MODES.find((m) => m.id === idA)!;
+    const modeB = MODES.find((m) => m.id === idB)!;
+    const tune = buildSharedTuneDegrees();
+    const eventsA = realizeDegrees(TONIC_HZ, modeA, tune, 400);
+    const eventsB = realizeDegrees(TONIC_HZ, modeB, tune, 400);
+
+    const differsSomewhere = eventsA.some((event, i) => Math.abs(event.frequency - eventsB[i].frequency) > 0.1);
+    expect(differsSomewhere).toBe(true);
   });
 });
 
