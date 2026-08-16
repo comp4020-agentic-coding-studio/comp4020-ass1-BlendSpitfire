@@ -332,3 +332,43 @@ section {
     border-radius: 1rem;
   }
 }
+
+/* Wide desktop viewports: put the mode buttons and the reactive wheel side by
+   side, so picking a mode and seeing/hearing it react both stay on screen at
+   once instead of the wheel sitting a full scroll below the button groups. */
+@media (width >= 900px) {
+  main {
+    max-width: 64rem;
+  }
+
+  #play {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 22rem);
+    grid-template-areas:
+      "heading heading"
+      "groups panel"
+      "hint hint";
+    column-gap: 2.5rem;
+    align-items: start;
+  }
+
+  #play h2 {
+    grid-area: heading;
+  }
+
+  #play .mode-groups {
+    grid-area: groups;
+    margin-bottom: 0;
+  }
+
+  #play .mode-panel {
+    grid-area: panel;
+    position: sticky;
+    top: 2rem;
+  }
+
+  #play > .hint {
+    grid-area: hint;
+    margin-top: 1.5rem;
+  }
+}

@@ -50,10 +50,7 @@ if (wheel && label && buttons.length > 0) {
     renderWheel(wheel, mode, null, playSingleNote);
     if (panel) panel.style.background = mode.panelBg;
 
-    const degrees =
-      mode.group === "pentatonic"
-        ? buildAscendingRunDegrees(mode.offsets.length)
-        : buildSharedTuneDegrees(mode.offsets.length);
+    const degrees = mode.group === "pentatonic" ? buildAscendingRunDegrees(mode.offsets.length) : buildSharedTuneDegrees();
     playAndTrack(degrees, mode, (degree) => renderWheel(wheel, mode, degree, playSingleNote));
   };
 

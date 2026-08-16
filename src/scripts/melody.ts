@@ -10,13 +10,13 @@ export function buildScaleRunDegrees(noteCount: number): number[] {
   return [...ascending, ...descending];
 }
 
-// The one shared tune every non-pentatonic mode plays on click — the same
-// arpeggio shape (up to the octave and back) realized in each mode's own
-// degrees, so the same melody visibly changes mood from mode to mode. Adapts
-// to 6- or 7-note scales via the octave wrap in frequencyForDegree (degree =
-// noteCount + 1 always lands one octave above the tonic).
-export function buildSharedTuneDegrees(noteCount: number): number[] {
-  return [1, 3, 5, noteCount + 1, 5, 3, 1];
+// The one shared tune every non-pentatonic mode plays on click — climb
+// stepwise almost to the top of the scale, then step back down to the tonic.
+// Walking every degree in between (not just skipping in thirds) is what
+// makes each mode's own color come through; every non-pentatonic mode has at
+// least 6 degrees, so this needs no octave wrap.
+export function buildSharedTuneDegrees(): number[] {
+  return [1, 2, 3, 4, 5, 6, 5, 3, 1];
 }
 
 // A single ascending pass through every note of the scale, ending on the
