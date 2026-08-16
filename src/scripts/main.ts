@@ -1,5 +1,5 @@
 import { playMelody, playNote } from "./audio-player";
-import { buildScaleRunDegrees, realizeDegrees } from "./melody";
+import { buildAscendingRunDegrees, buildScaleRunDegrees, buildSharedTuneDegrees, realizeDegrees } from "./melody";
 import { MODES } from "./modes";
 import type { Mode } from "./modes";
 import { renderBaselineWheel, renderModeLabel, renderWheel } from "./render-mode-view";
@@ -12,6 +12,7 @@ const label = document.querySelector<HTMLElement>("#mode-label");
 const buttons = document.querySelectorAll<HTMLButtonElement>("[data-mode-button]");
 const scaleButton = document.querySelector<HTMLButtonElement>("#play-scale-button");
 const baselineWheel = document.querySelector<HTMLElement>("#baseline-wheel");
+const panel = document.querySelector<HTMLElement>(".mode-panel");
 
 let stopCurrentPlayback: (() => void) | null = null;
 
@@ -47,8 +48,13 @@ if (wheel && label && buttons.length > 0) {
 
     renderModeLabel(label, mode);
     renderWheel(wheel, mode, null, playSingleNote);
+    if (panel) panel.style.background = mode.panelBg;
 
-    playAndTrack(mode.tune, mode, (degree) => renderWheel(wheel, mode, degree, playSingleNote));
+    const degrees =
+      mode.group === "pentatonic"
+        ? buildAscendingRunDegrees(mode.offsets.length)
+        : buildSharedTuneDegrees(mode.offsets.length);
+    playAndTrack(degrees, mode, (degree) => renderWheel(wheel, mode, degree, playSingleNote));
   };
 
   for (const button of buttons) {
@@ -66,4 +72,5 @@ if (wheel && label && buttons.length > 0) {
 
   renderModeLabel(label, MODES[0]);
   renderWheel(wheel, MODES[0], null, playSingleNote);
+  if (panel) panel.style.background = MODES[0].panelBg;
 }

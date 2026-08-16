@@ -1,6 +1,6 @@
 import { JSDOM } from "jsdom";
 import { describe, expect, it, vi } from "vitest";
-import { buildScaleRunDegrees, realizeDegrees } from "../src/scripts/melody";
+import { buildAscendingRunDegrees, buildScaleRunDegrees, buildSharedTuneDegrees, realizeDegrees } from "../src/scripts/melody";
 import { MODES, frequencyForDegree, modePattern } from "../src/scripts/modes";
 import { renderBaselineWheel, renderModeLabel, renderWheel } from "../src/scripts/render-mode-view";
 import { layoutWheel } from "../src/scripts/wheel-layout";
@@ -52,10 +52,14 @@ describe("mode interval tables", () => {
     expect(modePattern(ionian)).toBe("W-W-H-W-W-W-H");
   });
 
-  it("every mode has a non-empty, hand-composed tune using its own scale degrees", () => {
+  it("every mode's click-tune (shared skeleton or ascending run) stays within its own degrees", () => {
     for (const mode of MODES) {
-      expect(mode.tune.length).toBeGreaterThan(0);
-      for (const degree of mode.tune) {
+      const degrees =
+        mode.group === "pentatonic"
+          ? buildAscendingRunDegrees(mode.offsets.length)
+          : buildSharedTuneDegrees(mode.offsets.length);
+      expect(degrees.length).toBeGreaterThan(0);
+      for (const degree of degrees) {
         expect(degree).toBeGreaterThanOrEqual(1);
         expect(degree).toBeLessThanOrEqual(mode.offsets.length + 1);
       }
@@ -84,16 +88,31 @@ describe("scale-run degrees (walk every note of this mode's scale)", () => {
   });
 });
 
-describe("realizeDegrees (turns any degree list into playable events)", () => {
-  it("realizes a mode's own hand-composed tune in order, with sequential timing", () => {
-    const ionian = MODES.find((m) => m.id === "ionian")!;
-    const events = realizeDegrees(TONIC_HZ, ionian, ionian.tune, 400);
+describe("shared tune degrees (the one melody every non-pentatonic mode plays)", () => {
+  it("is the same shape — up to the octave and back — for both 6- and 7-note scales", () => {
+    expect(buildSharedTuneDegrees(7)).toEqual([1, 3, 5, 8, 5, 3, 1]);
+    expect(buildSharedTuneDegrees(6)).toEqual([1, 3, 5, 7, 5, 3, 1]);
+  });
+});
 
-    expect(events.map((e) => e.degree)).toEqual(ionian.tune);
-    expect(events.map((e) => e.startMs)).toEqual(ionian.tune.map((_, i) => i * 400));
+describe("ascending run degrees (what pentatonic scales play on click)", () => {
+  it("climbs straight to the octave with no descent, for any note count", () => {
+    expect(buildAscendingRunDegrees(5)).toEqual([1, 2, 3, 4, 5, 6]);
+    expect(buildAscendingRunDegrees(7)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+  });
+});
+
+describe("realizeDegrees (turns any degree list into playable events)", () => {
+  it("realizes the shared tune in order, with sequential timing", () => {
+    const ionian = MODES.find((m) => m.id === "ionian")!;
+    const tune = buildSharedTuneDegrees(ionian.offsets.length);
+    const events = realizeDegrees(TONIC_HZ, ionian, tune, 400);
+
+    expect(events.map((e) => e.degree)).toEqual(tune);
+    expect(events.map((e) => e.startMs)).toEqual(tune.map((_, i) => i * 400));
   });
 
-  it("realizes a scale-run the same way, independent of any mode's tune", () => {
+  it("realizes a scale-run the same way, independent of the shared tune", () => {
     const pentatonic = MODES.find((m) => m.id === "major-pentatonic")!;
     const degrees = buildScaleRunDegrees(pentatonic.offsets.length);
     const events = realizeDegrees(TONIC_HZ, pentatonic, degrees, 400);
@@ -101,9 +120,13 @@ describe("realizeDegrees (turns any degree list into playable events)", () => {
     expect(events.map((e) => e.degree)).toEqual(degrees);
   });
 
-  it("never produces a non-finite frequency for any mode's tune (guards the octave-wrap math)", () => {
+  it("never produces a non-finite frequency for any mode's click-tune (guards the octave-wrap math)", () => {
     for (const mode of MODES) {
-      const events = realizeDegrees(TONIC_HZ, mode, mode.tune, 400);
+      const degrees =
+        mode.group === "pentatonic"
+          ? buildAscendingRunDegrees(mode.offsets.length)
+          : buildSharedTuneDegrees(mode.offsets.length);
+      const events = realizeDegrees(TONIC_HZ, mode, degrees, 400);
       for (const event of events) {
         expect(Number.isFinite(event.frequency)).toBe(true);
       }

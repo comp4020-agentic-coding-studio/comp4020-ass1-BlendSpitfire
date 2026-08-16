@@ -165,7 +165,7 @@ section {
 }
 
 .mode-panel {
-  background: var(--mode-color, var(--accent));
+  background: var(--accent);
   border-radius: 1.5rem;
   padding: clamp(1.5rem, 5vw, 3rem);
   display: flex;
