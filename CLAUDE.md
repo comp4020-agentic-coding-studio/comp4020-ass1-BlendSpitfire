@@ -165,6 +165,23 @@ it down here. Growing this file is the work of harness engineering, and the gap
 between this boilerplate and your own version is part of what your prototype
 says about the developer you're becoming.
 
+## Writing visible text (copy)
+
+- Keep visible copy short and guiding, especially headings and small
+  hint/caption text --- say what to look at or click next, not a pitch for
+  the feature. If a sentence reads like it's selling the idea rather than
+  orienting the reader, cut it.
+- Never let notes about *how* something was built leak into user-facing
+  text. A phrase describing an implementation choice (e.g. "a fixed layout,
+  the same for every mode") is a comment about the code, not something a
+  visitor needs to be told --- it belongs in a code comment, not on the page.
+- Don't restate the request that produced the feature. If a sentence only
+  makes sense to someone who saw the prompt or spec behind it, rewrite or cut
+  it --- the reader never sees that context.
+- Before finalizing copy, reread it as a first-time visitor with no
+  knowledge of the build process. If it doesn't read that way, revise it
+  again.
+
 # Conventions
 
 - When editing this file (CLAUDE.md), write the content in English.

@@ -7,7 +7,7 @@ const otherScales = MODES.filter((mode) => mode.group === "other");
 const pentatonicScales = MODES.filter((mode) => mode.group === "pentatonic");
 ---
 
-<Layout title="Same melody, different mode — why a scale's shape changes its mood">
+<Layout title="Same melody, different mode">
   <header>
     <nav aria-label="Primary">
       <a href="#mode-primer">What is a mode</a>
@@ -15,13 +15,11 @@ const pentatonicScales = MODES.filter((mode) => mode.group === "pentatonic");
     </nav>
   </header>
   <main>
-    <h1>The same tune, thirteen different moods</h1>
+    <h1>One tune, thirteen modes</h1>
     <p data-testid="intro">
-      Every mode below is the same 12 notes, picking out a different subset in
-      a different order. Click a note on the wheel to hear it by itself, click
-      a mode to hear a short tune written for it, or play its full scale on
-      its own. What changes is only which notes get picked — and that alone
-      is enough to sound bright, sad, bittersweet, exotic, or tense.
+      Every mode below picks a different subset of the same 12 notes. Click a
+      note on the wheel to hear it alone, click a mode to hear a tune written
+      for it, or play its full scale.
     </p>
 
     <details class="mode-primer" id="mode-primer">
@@ -36,9 +34,8 @@ const pentatonicScales = MODES.filter((mode) => mode.group === "pentatonic");
       </p>
       <div id="baseline-wheel" class="wheel wheel-baseline" data-testid="baseline-wheel"></div>
       <p class="hint">
-        Five- and six-note scales (like the pentatonic scales further down)
-        select fewer notes than the seven-note church modes, which is part of
-        why they sound so different even though they draw from the same 12.
+        The pentatonic scales further down pick just 5 or 6 of these notes,
+        not 7 — one reason they sound so different.
       </p>
     </details>
 
@@ -107,11 +104,9 @@ const pentatonicScales = MODES.filter((mode) => mode.group === "pentatonic");
         <button type="button" id="play-scale-button" class="scale-button">▶ Hear the full scale</button>
       </div>
       <p class="hint">
-        The big circles are the piano's white keys (naturals); the small ones
-        nested between them are the black keys (accidentals) — a fixed
-        layout, the same for every mode. Whichever notes are filled in are
-        this mode's scale; the one with a dark outline is the note currently
-        sounding. Click any note directly to hear just that pitch.
+        Big circles are the white keys, small ones the black keys. Filled
+        circles are this mode's notes; the outlined one is playing now. Click
+        any note to hear it alone.
       </p>
     </section>
   </main>
