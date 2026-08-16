@@ -1,9 +1,5 @@
 # Process overview
 
-<!-- TEMPLATE: this file is a shape to fill in, not a form. Replace everything
-     in it with your own overview, and delete this comment — `pnpm
-     check:evidence` will remind you if it's still here. -->
-
 A reading-guide to how the work came together --- a map to your process, not an
 essay about it. Markers read this file and follow its citations; they don't
 trawl the repo for evidence you didn't point at, so if a moment mattered, cite
@@ -17,60 +13,73 @@ cover every deliverable.
 
 ## What I built
 
-One paragraph: the thing, and the idea behind it.
+A website that uses visuals and sound to show where each mode sits within the
+scale, how it sounds, and a short introduction to it. The site offers 13
+different modes, 11 of which share the same melody so their sound can be
+compared more clearly. 
 
 ## The moments that mattered
 
-Three or four for an assignment; fewer is fine for a weekly prototype. Keep the
-list short so each moment has room to do all four jobs:
+### 1. Having the agent restate design intent before implementing it
 
-1. **what happened** --- the problem, or the thing the agent got wrong
-2. **what you did instead of the obvious thing** --- the call you made, and why
-   it beat the obvious one
-3. **how you knew it was right** --- the check you ran, the viewport you looked
-   at, what you read before accepting the diff
-4. **the citation** --- a commit or commit range, a `CLAUDE.md` change, a check
-   that went from red to green, a prompt paired with the commit it produced
+- **What happened:** the ring-shaped note wheel's layout was hard to describe
+  in words, and the agent kept misreading the intent, producing the wrong
+  shape.
+- **What I did instead:** instead of stating every constraint up front, I gave
+  a more geometric description and had the agent restate its understanding
+  before writing any code, correcting the restatement over a few rounds
+  (including relaxing one constraint myself) until it was right.
+- **How I knew it was right:** it looked right by eye, and once the
+  restatement was right, a single generation placed everything correctly ---
+  no more regenerate-and-correct cycles.
+- **Citation:**
+  [`912a012`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass1-BlendSpitfire/commit/912a012)
+  (`wheel-layout.ts` / `render-mode-view.ts`).
 
-Jobs 2 and 3 are the ones the repo can't tell a reader on its own, so they're
-where the marks are. The strongest moments are the ones where a correction
-landed in the **harness** rather than in another prompt --- a rule added to
-`CLAUDE.md`, a check wired up, an attempt thrown away: re-prompting until it
-passes is the routine case, and changing what the agent works against is the
-skilled one.
+  > Prompt (excerpted, translated): "...restate it in your own words."
 
-Cite each moment as a link whose text is the commit hash or range and whose
-target is this repo's commit or compare URL, so a reader clicks straight to the
-evidence:
+### 2. Delegating the decision over specific parameter values to the agent
 
-- one commit: [`a1b2c3d`](https://github.com/YOUR-ORG/YOUR-REPO/commit/a1b2c3d)
-- a range:
-  [`a1b2c3d...e4f5a6b`](https://github.com/YOUR-ORG/YOUR-REPO/compare/a1b2c3d...e4f5a6b)
+- **What happened:** the wheel's circle sizes and spacing were "logically
+  correct but not aesthetically pleasing," and I had no specific numbers in
+  mind.
+- **What I did instead:** instead of tuning it myself or letting the agent
+  guess, I set the constraints (no tangency, a smaller size gap) and delegated
+  the numbers, requiring it to justify them with graphic-design ratios.
+- **How I knew it was right:** it read as coherent.
+- **Citation:** `NOTCH_CLEARANCE`, `RING_RADIUS`, `BIG_RADIUS`, `SMALL_RADIUS`
+  in `wheel-layout.ts`, in
+  [`912a012`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass1-BlendSpitfire/commit/912a012).
 
-To pair a prompt with the commit it produced, quote the prompt (curated, not a
-full transcript) next to the citation:
+### 3. Writing the auto-commit rule into `CLAUDE.md` instead of repeating it verbally
 
-> the prompt, verbatim
+- **What happened:** Claude Code won't commit unless told to, even with
+  `pnpm check` fully green --- I had to ask every time.
+- **What I did instead:** wrote the convention into `CLAUDE.md`: commit
+  automatically after significant work, ask first for a small edit.
+- **How I knew it was right:** behavior matched what I expected afterward, and
+  since `CLAUDE.md` carries forward, it keeps working in later projects too.
+- **Citation:**
+  [`222a8ec`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass1-BlendSpitfire/commit/222a8ec).
 
-Screenshots are welcome where one carries the verification better than a
-sentence does. Commit the file to this repo and link it with a **relative**
-path, which is what makes it render on GitHub: `![alt text](docs/before.png)`.
-Images don't count towards the word count and don't replace the citation.
+### 4. Treating a compaction-revived stale instruction as background, not a live request
 
-### A worked moment, for shape
-
-Delete this section along with the rest of the boilerplate --- it's here to show
-the four jobs in one paragraph, not to be imitated in content.
-
-> The date formatter kept coming back with `toLocaleDateString()` and no locale
-> argument, so the same build rendered differently on my machine and in CI. I'd
-> already re-prompted it twice, which fixed the line but not the habit, so the
-> third time I put the rule in `CLAUDE.md` instead
-> ([`3f9ac21`](https://github.com/YOUR-ORG/YOUR-REPO/commit/3f9ac21)) and added
-> a spec test that fails on a bare `toLocaleDateString`. That's what told me it
-> had actually taken: the test went red against the old code and green against
-> the new, and the next two features it wrote passed it without prompting
-> ([`3f9ac21...b7e0d14`](https://github.com/YOUR-ORG/YOUR-REPO/compare/3f9ac21...b7e0d14)).
+- **What happened:** after a context compaction, Claude surfaced a confusing
+  multiple-choice question about a request I'd never made --- the site was
+  already finished.
+- **What I did instead:** I said I'd never given that instruction and asked
+  Claude to trace it: a stale, superseded instruction the compaction had
+  mistakenly carried forward. Nothing broke, since Claude flagged the mismatch
+  instead of acting, and I paused instead of picking an option blindly. I
+  asked how to stop this recurring, and agreed to a `CLAUDE.md` check once
+  confirming it wouldn't waste tokens by firing often.
+- **How I knew it was right:** unconfirmed so far --- the real test is whether
+  it stops recurring.
+- **Citation:**
+  [`095a5e2`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass1-BlendSpitfire/commit/095a5e2)
+  (the rule in `CLAUDE.md`);
+  [`912a012`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass1-BlendSpitfire/commit/912a012)
+  dates the stale instruction as superseded.
 
 ## Before you ship
 
