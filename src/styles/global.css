@@ -14,7 +14,8 @@ body {
   margin: 0;
   padding: clamp(1.5rem, 4vw, 4rem);
   font-family:
-    system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    system-ui, -apple-system, "PingFang SC", "Hiragino Sans", "Microsoft YaHei", "Segoe UI",
+    "Helvetica Neue", Arial, sans-serif;
   line-height: 1.6;
   color: var(--text);
   background: var(--bg);
@@ -305,6 +306,7 @@ section {
 
 .wheel-note-clickable {
   cursor: pointer;
+  outline: none;
 }
 
 .wheel-note-clickable:hover,
@@ -313,8 +315,12 @@ section {
 }
 
 .wheel-note-clickable:focus-visible {
-  outline: 3px solid var(--text);
-  outline-offset: 2px;
+  stroke: var(--text);
+  stroke-width: 3;
+}
+
+.mode-panel .wheel-note-clickable:focus-visible {
+  stroke: #fff;
 }
 
 .hint {
@@ -338,12 +344,42 @@ section {
    once instead of the wheel sitting a full scroll below the button groups. */
 @media (width >= 900px) {
   main {
-    max-width: 64rem;
+    max-width: 78rem;
+  }
+
+  body {
+    padding-block: clamp(1rem, 4vh, 3rem);
+  }
+
+  header nav {
+    margin-bottom: clamp(1rem, 4vh, 2.5rem);
+  }
+
+  h1 {
+    font-size: clamp(2rem, 2.2vh + 2vw, 3.75rem);
+    margin-bottom: clamp(0.75rem, 2vh, 1.25rem);
+  }
+
+  p[data-testid="intro"] {
+    max-width: 44rem;
+    line-height: 1.5;
+  }
+
+  section {
+    margin-block: clamp(1.25rem, 4vh, 2.5rem);
+  }
+
+  .mode-primer {
+    margin-block: 1.25rem clamp(1.25rem, 4vh, 2.5rem);
+  }
+
+  h2 {
+    margin-bottom: clamp(1rem, 3vh, 1.5rem);
   }
 
   #play {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(300px, 22rem);
+    grid-template-columns: minmax(280px, 46%) minmax(0, 54%);
     grid-template-areas:
       "heading heading"
       "groups panel"
@@ -365,6 +401,16 @@ section {
     grid-area: panel;
     position: sticky;
     top: 2rem;
+    padding: clamp(0.75rem, 2.5vh, 1.5rem);
+    gap: 0.6rem;
+  }
+
+  #play .mode-panel .wheel {
+    width: min(100%, 34vh, 360px);
+  }
+
+  #play .mode-panel .mode-description {
+    max-width: 100%;
   }
 
   #play > .hint {
