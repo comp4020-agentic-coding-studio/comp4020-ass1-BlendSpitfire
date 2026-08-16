@@ -82,12 +82,21 @@ section {
 .mode-primer summary {
   cursor: pointer;
   list-style: none;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding-block: 0.5rem;
-  font-weight: 800;
-  font-size: 1.1rem;
+  padding: 0.6rem 1.1rem;
+  border: 2px solid var(--border);
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text);
+  transition: border-color 0.15s ease;
+}
+
+.mode-primer summary:hover,
+.mode-primer[open] summary {
+  border-color: var(--accent);
 }
 
 .mode-primer summary::-webkit-details-marker {
@@ -97,6 +106,7 @@ section {
 .mode-primer summary::before {
   content: "▸";
   color: var(--accent);
+  font-size: 0.85em;
   transition: transform 0.15s ease;
 }
 
